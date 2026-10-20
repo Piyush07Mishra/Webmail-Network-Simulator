@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Webmail Network Simulator</title>
+<style>
+:root{--bg:#07111f;--panel:#101e31;--panel2:#14263d;--text:#eaf2ff;--muted:#9fb2cc;--blue:#55b7ff;--green:#3de0b1;--orange:#ffbf69;--pink:#ff76ad;--red:#ff7070}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#132d4a 0%,var(--bg) 58%);color:var(--text);font:15px/1.45 Inter,system-ui,Segoe UI,Arial,sans-serif}
+header{padding:24px clamp(16px,3vw,42px) 12px;display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}h1{margin:0;font-size:clamp(25px,3vw,38px);letter-spacing:-.04em}h1 span{color:var(--green)}.subtitle{color:var(--muted);margin-top:5px}.pill{border:1px solid #2a4564;border-radius:99px;padding:7px 12px;color:#b9d8ff;background:#10233a;font-size:12px}
+main{padding:12px clamp(12px,2vw,30px) 32px;max-width:1600px;margin:auto}.controls{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-bottom:14px}.card{background:linear-gradient(145deg,rgba(20,38,61,.96),rgba(12,26,43,.96));border:1px solid #29415e;border-radius:16px;box-shadow:0 14px 34px #0002}.form-card{grid-column:span 8;padding:16px}.action-card{grid-column:span 4;padding:16px;display:flex;flex-direction:column;justify-content:space-between;gap:12px}label{display:block;color:#b8c9df;font-size:12px;margin:0 0 6px}input,textarea,select{width:100%;background:#081626;border:1px solid #304a68;color:var(--text);border-radius:9px;padding:10px 11px;font:inherit;outline:none}input:focus,textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px #55b7ff20}.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.fields .wide{grid-column:1/-1}textarea{resize:vertical;min-height:68px}.buttons{display:flex;flex-wrap:wrap;gap:8px}.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:700;color:#061321;background:var(--green);cursor:pointer;transition:transform .15s,filter .15s}.btn:hover{filter:brightness(1.1);transform:translateY(-1px)}.btn.secondary{background:#25415f;color:#eaf2ff;border:1px solid #3b5877}.btn.orange{background:var(--orange)}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}.tiny{font-size:12px;color:var(--muted)}
+.sim-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(280px,.8fr);gap:14px}.network{padding:14px;min-width:0}.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px}.section-title h2{font-size:17px;margin:0}.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}.diagram-wrap{position:relative;border-radius:12px;background:linear-gradient(180deg,#081626,#0c1a2b);border:1px solid #203954;overflow:hidden}.diagram{width:100%;height:auto;display:block;min-height:340px}.node{fill:#132b44;stroke:#385a7a;stroke-width:1.5}.node-label{fill:#eaf2ff;font-size:14px;font-weight:700;text-anchor:middle}.node-sub{fill:#a9bfd8;font-size:10px;text-anchor:middle}.node-icon{font-size:23px;text-anchor:middle}.arrow{fill:none;stroke:#41607e;stroke-width:2.4;marker-end:url(#arrowHead)}.arrow-label{fill:#b7cbe3;font-size:10px;text-anchor:middle}.arrow.active{stroke:var(--green);stroke-dasharray:8 7;animation:dash .7s linear infinite;filter:drop-shadow(0 0 4px #3de0b1)}.packet{fill:var(--orange);stroke:#fff3d9;stroke-width:1.5;filter:drop-shadow(0 0 7px #ffbf69);opacity:0}.packet.show{opacity:1}.stage-chip{fill:#102a43;stroke:#2d5378}.stage-chip-text{fill:#c5e2ff;font-size:11px;text-anchor:middle;font-weight:700}@keyframes dash{to{stroke-dashoffset:-30}}.side{display:flex;flex-direction:column;gap:14px}.side .card{padding:15px}.status{display:flex;align-items:center;gap:8px;font-weight:700}.status-led{width:9px;height:9px;border-radius:50%;background:var(--orange);box-shadow:0 0 12px currentColor}.status-led.running{background:var(--green)}.progress{height:7px;background:#091626;border-radius:9px;overflow:hidden;margin:12px 0}.progress div{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--green));transition:width .3s}.stage-name{font-size:18px;font-weight:800;margin:6px 0}.stage-desc{color:#bdd0e7;min-height:56px}.step-count{color:var(--muted);font-size:12px}.log{height:250px;overflow:auto;display:flex;flex-direction:column;gap:8px;padding-right:3px}.log-entry{border-left:3px solid var(--blue);padding:8px 9px;background:#0a192a;border-radius:0 8px 8px 0;font-size:12px}.log-entry strong{display:block;color:#d7eaff;font-size:12px}.log-entry small{display:block;color:#91a8c3;margin-top:3px}.log-entry.good{border-color:var(--green)}.log-entry.warn{border-color:var(--orange)}.lower{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px}.lower .card{padding:15px}.lower h2{font-size:17px;margin:0 0 10px}.protocols{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.protocol{padding:10px;background:#0b1a2b;border:1px solid #29415e;border-radius:10px}.protocol b{display:block;margin-bottom:4px}.protocol p{margin:0;color:var(--muted);font-size:12px}.email-preview{background:#0a192a;border:1px solid #29415e;border-radius:10px;padding:12px}.email-row{display:grid;grid-template-columns:62px 1fr;gap:8px;margin:5px 0;font-size:13px}.email-row span{color:var(--muted)}.body-text{white-space:pre-wrap;border-top:1px solid #29415e;padding-top:10px;margin-top:9px;color:#e2edfa}.footer{text-align:center;color:#7188a4;font-size:11px;padding:20px 10px}
+@media(max-width:1000px){.form-card,.action-card{grid-column:span 12}.sim-grid{grid-template-columns:1fr}.lower{grid-template-columns:1fr}.diagram{min-height:280px}}@media(max-width:620px){.fields{grid-template-columns:1fr}.fields .wide{grid-column:auto}.protocols{grid-template-columns:1fr}.diagram{min-height:220px}.log{height:200px}}
+</style>
+</head>
+<body>
+<header>
+  <div><h1>Webmail <span>Network Simulator</span></h1><div class="subtitle">Follow an email from the sender's browser to the recipient's mailbox.</div></div>
+  <div class="pill">EDUCATIONAL MINI PROJECT · LOCAL SIMULATION</div>
+</header>
+<main>
+  <section class="controls">
+    <div class="card form-card">
+      <div class="fields">
+        <div><label for="from">SENDER ADDRESS</label><input id="from" value="alice@outlook.com" type="email"></div>
+        <div><label for="to">RECIPIENT ADDRESS</label><input id="to" value="bob@gmail.com" type="email"></div>
+        <div><label for="subject">SUBJECT</label><input id="subject" value="Computer Networks Demo"></div>
+        <div><label for="mode">SIMULATION MODE</label><select id="mode"><option value="full">Full flow (webmail + DNS + SMTP + TCP)</option><option value="smtp">Mail transfer only (SMTP + DNS + TCP)</option></select></div>
+        <div class="wide"><label for="body">MESSAGE BODY</label><textarea id="body">Hello Bob! This demo shows how webmail delivers a message across the internet.</textarea></div>
+      </div>
+    </div>
+    <div class="card action-card">
+      <div><div class="status"><span class="status-led" id="led"></span><span id="status">Ready to simulate</span></div><p class="tiny">Nothing is sent over the internet. This visualizes the protocol steps locally.</p></div>
+      <div class="buttons"><button class="btn" id="start">▶ Run simulation</button><button class="btn secondary" id="step">Next step →</button><button class="btn orange" id="reset">↺ Reset</button></div>
+      <div class="tiny">Tip: use “Next step” to explain each stage during your presentation.</div>
+    </div>
+  </section>
+
+  <section class="sim-grid">
+    <div class="card network">
+      <div class="section-title"><h2>Live network flow</h2><div class="legend"><span><i class="dot" style="background:var(--green)"></i>Active route</span><span><i class="dot" style="background:var(--orange)"></i>Message packet</span></div></div>
+      <div class="diagram-wrap">
+        <svg class="diagram" viewBox="0 0 900 550" role="img" aria-label="Animated webmail delivery network diagram">
+          <defs><marker id="arrowHead" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#6688a8"/></marker><marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#3de0b1"/></marker></defs>
+          <path id="p1" class="arrow" d="M145 105 L145 150"/><text class="arrow-label" x="185" y="130">HTTPS</text>
+          <path id="p2" class="arrow" d="M235 205 L300 205"/><text class="arrow-label" x="267" y="190">Request</text>
+          <path id="p3" class="arrow" d="M385 250 L385 315"/><text class="arrow-label" x="433" y="286">Submit</text>
+          <path id="p4" class="arrow" d="M465 355 L520 355"/><text class="arrow-label" x="492" y="340">DNS + SMTP</text>
+          <path id="p5" class="arrow" d="M605 315 L605 250"/><text class="arrow-label" x="652" y="286">Accept</text>
+          <path id="p6" class="arrow" d="M690 205 L755 205"/><text class="arrow-label" x="722" y="190">Fetch</text>
+          <path id="p7" class="arrow" d="M790 150 L790 105"/><text class="arrow-label" x="830" y="130">HTTPS</text>
+          <g id="nSender"><rect class="node" x="55" y="25" width="180" height="80" rx="13"/><text class="node-icon" x="145" y="55">👩‍💻</text><text class="node-label" x="145" y="76">Sender / Browser</text><text class="node-sub" id="senderLabel" x="145" y="92">alice@outlook.com</text></g>
+          <g id="nWeb"><rect class="node" x="55" y="150" width="180" height="100" rx="13"/><text class="node-icon" x="145" y="181">🌐</text><text class="node-label" x="145" y="202">Outlook Web App</text><text class="node-sub" x="145" y="219">HTTPS · Session check</text><text class="node-sub" x="145" y="233">Compose / Send request</text></g>
+          <g id="nSenderMail"><rect class="node" x="300" y="150" width="170" height="100" rx="13"/><text class="node-icon" x="385" y="181">📨</text><text class="node-label" x="385" y="202">Sender Mail System</text><text class="node-sub" x="385" y="219">Queue · Policy checks</text><text class="node-sub" x="385" y="233">Mailbox / Sent Items</text></g>
+          <g id="nInternet"><rect class="node" x="300" y="315" width="170" height="80" rx="13"/><text class="node-icon" x="385" y="344">🌍</text><text class="node-label" x="385" y="365">Internet / DNS</text><text class="node-sub" x="385" y="381">MX → hostname → IP</text></g>
+          <g id="nSmtp"><rect class="node" x="520" y="315" width="170" height="80" rx="13"/><text class="node-icon" x="605" y="344">🔐</text><text class="node-label" x="605" y="365">SMTP + TCP</text><text class="node-sub" x="605" y="381">Transfer / acknowledgement</text></g>
+          <g id="nReceiverMail"><rect class="node" x="520" y="150" width="170" height="100" rx="13"/><text class="node-icon" x="605" y="181">🗄️</text><text class="node-label" x="605" y="202">Recipient Mail System</text><text class="node-sub" x="605" y="219">Spam / security checks</text><text class="node-sub" x="605" y="233">Store in mailbox</text></g>
+          <g id="nReceiverWeb"><rect class="node" x="755" y="150" width="115" height="100" rx="13"/><text class="node-icon" x="812" y="181">📬</text><text class="node-label" x="812" y="202">Gmail Web</text><text class="node-sub" x="812" y="219">Fetch mailbox</text><text class="node-sub" x="812" y="233">Display inbox</text></g>
+          <g id="nRecipient"><rect class="node" x="705" y="25" width="170" height="80" rx="13"/><text class="node-icon" x="790" y="55">👨‍💻</text><text class="node-label" x="790" y="76">Recipient / Browser</text><text class="node-sub" id="recipientLabel" x="790" y="92">bob@gmail.com</text></g>
+          <circle id="packet" class="packet" r="8" cx="145" cy="105"/>
+          <rect class="stage-chip" x="22" y="440" width="856" height="78" rx="12"/>
+          <text class="stage-chip-text" x="450" y="462">WHAT IS HAPPENING NOW?</text>
+          <text id="diagramStage" class="node-label" x="450" y="486">Ready — press Run simulation</text>
+          <text id="diagramDetail" class="node-sub" x="450" y="504">The message will travel through the illustrated network steps.</text>
+        </svg>
+      </div>
+    </div>
+    <aside class="side">
+      <div class="card">
+        <div class="section-title"><h2>Current stage</h2><span class="step-count" id="stepCount">0 / 8</span></div>
+        <div class="progress"><div id="progress"></div></div>
+        <div class="stage-name" id="stageName">Ready to begin</div>
+        <div class="stage-desc" id="stageDesc">Run the simulation to see how a webmail message moves from the sender to the recipient.</div>
+        <div class="tiny" id="protocolTag">Protocols: —</div>
+      </div>
+      <div class="card">
+        <div class="section-title"><h2>Event log</h2><button class="btn secondary" id="clearLog" style="padding:5px 8px;font-size:11px">Clear</button></div>
+        <div class="log" id="log"><div class="log-entry"><strong>Simulator initialized</strong><small>Local demonstration only; no network email is sent.</small></div></div>
+      </div>
+    </aside>
+  </section>
+
+  <section class="lower">
+    <div class="card">
+      <h2>Protocol cheat sheet</h2>
+      <div class="protocols">
+        <div class="protocol"><b style="color:var(--blue)">HTTPS</b><p>Browser ↔ webmail application. Usually TCP 443 for HTTP/1.1 and HTTP/2; HTTP/3 uses QUIC/UDP.</p></div>
+        <div class="protocol"><b style="color:var(--green)">DNS</b><p>MX locates mail exchangers. A/AAAA resolves the selected server hostname to an IP address. Usually UDP/TCP 53.</p></div>
+        <div class="protocol"><b style="color:var(--orange)">SMTP</b><p>Transfers email between mail systems. Common ports: 25 for server-to-server, 587 for message submission.</p></div>
+        <div class="protocol"><b style="color:var(--pink)">TCP</b><p>Reliable, ordered byte stream, acknowledgements, retransmission, flow and congestion control.</p></div>
+        <div class="protocol"><b style="color:#c6a6ff">IMAP</b><p>Mailbox access and synchronization for compatible email clients. Common secure port 993.</p></div>
+        <div class="protocol"><b style="color:#ffd3a0">POP3</b><p>Retrieves messages from a mail server. Common secure port 995.</p></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Message being simulated</h2>
+      <div class="email-preview">
+        <div class="email-row"><span>From</span><b id="previewFrom">alice@outlook.com</b></div>
+        <div class="email-row"><span>To</span><b id="previewTo">bob@gmail.com</b></div>
+        <div class="email-row"><span>Subject</span><b id="previewSubject">Computer Networks Demo</b></div>
+        <div class="body-text" id="previewBody">Hello Bob! This demo shows how webmail delivers a message across the internet.</div>
+      </div>
+      <p class="tiny">Educational simplification: real providers use many distributed services. Webmail may access its own mailbox storage directly; IMAP/POP are typically relevant to external mail clients.</p>
+    </div>
+  </section>
+  <div class="footer">Computer Networks Mini Project · Webmail flow visualizer · No login credentials collected · No real email is sent</div>
+</main>
+<script>
+const stages=[
+{title:"1. Open webmail and log in",desc:"The sender opens Outlook in a browser. HTTPS protects the browser-to-webmail connection; the application verifies the user's session.",protocol:"HTTPS · TLS · TCP (traditional HTTP/1.1 or HTTP/2)",node:"p1",from:[145,105],to:[145,150],log:"Browser connects securely to the webmail application."},
+{title:"2. Submit the compose/send request",desc:"The user presses Send. The webmail application receives the request and checks session permissions before processing it.",protocol:"HTTPS · Application request",node:"p2",from:[235,205],to:[300,205],log:"Webmail server receives the send request."},
+{title:"3. Prepare and queue the message",desc:"The sending mail system prepares message headers and body, applies policy checks, and may save a copy in Sent Items or queue it for delivery.",protocol:"Mail application · Queue · MIME (if formatted/attachments)",node:"p3",from:[385,250],to:[385,315],log:"Message is prepared, checked and queued for delivery."},
+{title:"4. Resolve the recipient domain with DNS",desc:"The sending system uses the recipient domain's MX records to find mail exchangers, then resolves the selected hostname with A/AAAA records.",protocol:"DNS MX · A/AAAA · UDP/TCP 53",node:"p4",from:[470,355],to:[520,355],log:"DNS identifies the destination mail server hostname and IP address."},
+{title:"5. Transfer message using SMTP over TCP",desc:"The mail systems establish a TCP connection and exchange SMTP commands. TLS may protect the SMTP hop. The receiver can respond with a 250 success reply when it accepts the message.",protocol:"TCP · SMTP · Common ports 25 / 587 depending on role",node:"p5",from:[605,315],to:[605,250],log:"SMTP transfers the message; TCP provides reliable ordered transport for this connection."},
+{title:"6. Check and store in recipient mailbox",desc:"The receiving system applies relevant spam, malware, sender-policy and mailbox checks. If accepted, the message is stored and routed to the user's mailbox.",protocol:"Receiving mail system · Filtering · Mailbox storage",node:"p6",from:[690,205],to:[755,205],log:"Recipient system accepts and stores the message in the mailbox."},
+{title:"7. Recipient opens Gmail",desc:"Bob opens Gmail and signs in. The browser sends HTTPS requests to the Gmail web application; the service checks the session and mailbox permissions.",protocol:"HTTPS · TLS · TCP (traditional HTTP/1.1 or HTTP/2)",node:"p7",from:[790,150],to:[790,105],log:"Recipient opens Gmail and requests their inbox."},
+{title:"8. Fetch and display the received email",desc:"The Gmail web application retrieves the message from its mailbox storage and renders it in the inbox. External clients may use IMAP or POP3 instead.",protocol:"Webmail application · Mailbox storage · IMAP/POP for compatible external clients",node:null,from:[790,105],to:[790,105],log:"Email is displayed to Bob. Simulation complete."}
+];
+let index=-1, running=false, timer=null;
+const $=id=>document.getElementById(id);
+function syncPreview(){ $('previewFrom').textContent=$('from').value||'sender@example.com';$('previewTo').textContent=$('to').value||'recipient@example.com';$('previewSubject').textContent=$('subject').value||'(no subject)';$('previewBody').textContent=$('body').value; $('senderLabel').textContent=$('from').value||'sender@example.com';$('recipientLabel').textContent=$('to').value||'recipient@example.com';}
+['from','to','subject','body'].forEach(id=>$(id).addEventListener('input',syncPreview));
+function addLog(title,detail,kind=''){const el=document.createElement('div');el.className='log-entry '+kind;const b=document.createElement('strong');b.textContent=title;const s=document.createElement('small');s.textContent=new Date().toLocaleTimeString()+' · '+detail;el.append(b,s);$('log').prepend(el);}
+function clearActive(){document.querySelectorAll('.arrow').forEach(p=>p.classList.remove('active'));$('packet').classList.remove('show');}
+function animatePacket(stage){const packet=$('packet');packet.classList.add('show');const [x1,y1]=stage.from,[x2,y2]=stage.to;const start=performance.now(),duration=850;function frame(now){let t=Math.min(1,(now-start)/duration);packet.setAttribute('cx',x1+(x2-x1)*t);packet.setAttribute('cy',y1+(y2-y1)*t);if(t<1&&running)requestAnimationFrame(frame);else if(t>=1)packet.classList.remove('show');}requestAnimationFrame(frame);}
+function renderStage(i){if(i<0){return}const s=stages[i];clearActive();if(s.node){$(s.node).classList.add('active');animatePacket(s)}$('stageName').textContent=s.title;$('stageDesc').textContent=s.desc;$('protocolTag').textContent='Protocols: '+s.protocol;$('stepCount').textContent=(i+1)+' / '+stages.length;$('progress').style.width=((i+1)/stages.length*100)+'%';$('diagramStage').textContent=s.title;$('diagramDetail').textContent=s.protocol;$('status').textContent=i===stages.length-1?'Delivery simulated':'Simulating step '+(i+1);$('led').classList.toggle('running',i<stages.length-1);addLog(s.title,s.log,i===stages.length-1?'good':'');if(i===stages.length-1){running=false;clearInterval(timer);timer=null;$('start').disabled=false;$('start').textContent='↻ Run again';}}
+function next(){if(index>=stages.length-1){running=false;return}index++;renderStage(index);if(index===stages.length-1){$('status').textContent='Simulation complete';addLog('End-to-end flow complete','The email was simulated locally; no message was sent.','good')}}
+function start(){if(running)return;syncPreview();if(index>=stages.length-1)reset(false);running=true;$('start').disabled=true;$('start').textContent='Simulation running…';next();timer=setInterval(()=>{if(index<stages.length-1)next();else{clearInterval(timer);timer=null;running=false}},1900)}
+function reset(clear=true){if(timer)clearInterval(timer);timer=null;running=false;index=-1;clearActive();$('packet').setAttribute('cx',145);$('packet').setAttribute('cy',105);$('stageName').textContent='Ready to begin';$('stageDesc').textContent='Run the simulation to see how a webmail message moves from the sender to the recipient.';$('protocolTag').textContent='Protocols: —';$('stepCount').textContent='0 / '+stages.length;$('progress').style.width='0%';$('diagramStage').textContent='Ready — press Run simulation';$('diagramDetail').textContent='The message will travel through the illustrated network steps.';$('status').textContent='Ready to simulate';$('led').classList.remove('running');$('start').disabled=false;$('start').textContent='▶ Run simulation';if(clear)$('log').innerHTML='<div class="log-entry"><strong>Simulator reset</strong><small>Ready for a new local demonstration.</small></div>'}
+$('start').addEventListener('click',start);$('step').addEventListener('click',()=>{if(timer){clearInterval(timer);timer=null}running=false;$('start').disabled=false;$('start').textContent='▶ Continue / Run';next()});$('reset').addEventListener('click',()=>reset());$('clearLog').addEventListener('click',()=>$('log').innerHTML='');syncPreview();
+</script>
+</body>
+</html>
