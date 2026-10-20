@@ -9,6 +9,12 @@
 
 No server, package installation, API key, or internet connection is required. This is a front-end educational simulation; it does not send real email or collect credentials.
 
+## Deploy to Vercel
+1. Import this GitHub repository into Vercel.
+2. Keep the framework preset as **Other**.
+3. Leave the build command and output directory empty.
+4. Deploy. The included `vercel.json` serves the static `index.html` application.
+
 ## Concepts visualized
 - Browser to webmail application over HTTPS
 - Authentication and send request
